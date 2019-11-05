@@ -14,7 +14,6 @@ const Country = ({name, capital, population, languages, flag}) => {
   }, [weatherURL]);
 
   const showWeather = () => {
-    console.log(weather)
     return (
       <>
       <h2>Weather in {capital}</h2>

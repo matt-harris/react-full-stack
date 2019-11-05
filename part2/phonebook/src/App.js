@@ -2,6 +2,7 @@ import React, {useState, useEffect} from 'react';
 import Filter from './components/Filter';
 import PersonForm from './components/PersonForm';
 import Persons from './components/Persons';
+import Notification from './components/Notification';
 import personService from './services/Person';
 
 const App = () => {
@@ -9,6 +10,7 @@ const App = () => {
   const [newName, setNewName] = useState('');
   const [newNumber, setNewNumber] = useState('');
   const [newFilter, setNewFilter] = useState('');
+  const [message, setMessage] = useState({content: '', type: ''});
 
   useEffect(() => {
     personService
@@ -36,6 +38,13 @@ const App = () => {
         .deleteEntry(id)
         .then(() => {
           setPersons(persons.filter(person => person.id !== id));
+          setMessage({
+            content:`${name} was deleted from the phonebook`,
+            type: 'success',
+          });
+          setTimeout(() => {
+            setMessage({content:'', type: '',});
+          }, 5000);
         });
     }
   }
@@ -53,6 +62,26 @@ const App = () => {
           setPersons(persons.map(person => person.id !== updatedPerson.id ? person : updatedPerson));
           setNewName('');
           setNewNumber('');
+
+          setMessage({
+            content:`${updatedPerson.name}'s number was updated`,
+            type: 'success',
+          });
+          setTimeout(() => {
+            setMessage({content:'', type: '',});
+          }, 5000);
+        })
+        .catch(error => {
+          setPersons(persons.filter(person => person.id !== p.id));
+          setNewName('');
+          setNewNumber('');
+          setMessage({
+            content:`Information for ${p.name} has already been removed from phonebook`,
+            type: 'error',
+          });
+          setTimeout(() => {
+            setMessage({content:'', type: '',});
+          }, 5000);
         })
     }
     return true;
@@ -78,12 +107,22 @@ const App = () => {
         setPersons(persons.concat(returnedPerson));
         setNewName('');
         setNewNumber('');
+        setMessage({
+          content:`${returnedPerson.name} was added to the phonebook`,
+          type: 'success',
+        });
+        setTimeout(() => {
+          setMessage({content:'', type: '',});
+        }, 5000);
       });
   };
 
   return (
     <>
       <h2>Phonebook</h2>
+
+      <Notification message={message} />
+
       <Filter value={newFilter} onChange={handleFilterChange} />
 
       <h3>Add a new contact</h3>
